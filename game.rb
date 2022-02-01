@@ -1,46 +1,39 @@
-class Game
-  attr_accessor :turn, :player1, :player2
+class Match
+  def initialize(name)
+    @name = name
+    @player_1 = Player.new("Player 1")
+    @player_2 = Player.new("Player 2")
+  end
 
-  def initialize
-    @turn = 1
-    @player1 = 3
-    @player2 = 3
-  end 
-  
-  def update_lives(turn)
-    if turn == 1
-      @player1 -= 1
-    else 
-      @player2 -= 1
-    end
-    if @player1 == 0 || @player2 == 0
-      game_over
+  def start 
+    puts "Lets Start #{@player_1.name} and #{@player_2.name}"
+    self.turn
+  end
+
+  def result 
+    puts "Player 1: #{@player_1.lives}/3 lives left vs Player 2: #{@player_2.lives}/3 lives left"
+  end
+
+  def turn 
+    @player_1.new_question
+    self.score
+    @player_2.new_question
+    self.score
+    self.result
+    puts "--- New Turn ---"
+    self.turn
+  end
+
+  def score
+    if @player_1.lost 
+      winner(@player_2)
+    elsif @player_2.lost
+      winner(@player_1)
     end
   end
   
-  def update_turn(turn)
-    if turn == 1
-      @turn = 2
-    else
-      @turn = 1
-    end
-    start
-  end
-  
-  def start
-    puts "Player 1: #{@player1}/3 lives. Player 2: #{@player2}/3 lives."
-    # create_players
-    question = Question.new(turn)
-    if !question.start
-      update_lives(turn)
-    end
-    update_turn(turn)
-  end
-  
-  def game_over
-    puts "Player 1: #{@player1}/3 lives. Player 2: #{@player2}/3 lives."
-    puts "------ GAME OVER!! ------"
-    puts "Goodbye!"
+  def winner(name)
+    puts "The winner is #{name.name} with #{name.lives}/3 lives left"
     exit(0)
   end
-end
+end 
