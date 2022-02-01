@@ -1,39 +1,48 @@
-class Match
-  def initialize(name)
-    @name = name
-    @player_1 = Player.new("Player 1")
-    @player_2 = Player.new("Player 2")
+require "./players"
+require "./question"
+
+class Game 
+
+  def initialize
+    @player1 = Player.new('Ali', 3)
+    @player2 = Player.new('John', 3)
+    @current_player = @player1
   end
 
-  def start 
-    puts "Lets Start #{@player_1.name} and #{@player_2.name}"
-    self.turn
+  def scores_of_players
+    puts "#{@player1.name} : #{@player1.lives}/3 vs #{@player2.name} : #{@player2.lives}/3"
+    puts "\n"
+    puts "----- NEW TURN -----"
+    puts "\n"
   end
 
-  def result 
-    puts "Player 1: #{@player_1.lives}/3 lives left vs Player 2: #{@player_2.lives}/3 lives left"
+  def switch_player
+    @current_player = (@current_player == @player1)? @player2 : @player1
   end
 
-  def turn 
-    @player_1.new_question
-    self.score
-    @player_2.new_question
-    self.score
-    self.result
-    puts "--- New Turn ---"
-    self.turn
-  end
+  def start
+    puts "----- Lets Play!!-----"
+    puts "\n"
+    self.switch_player
+    question = Question.new
+    question.ask(@current_player.name)
+    answer = gets.chomp.to_i
 
-  def score
-    if @player_1.lost 
-      winner(@player_2)
-    elsif @player_2.lost
-      winner(@player_1)
+    if answer == question.sum
+      puts "Yes, you are correct!"
+      self.scores_of_players
+      self.start
+    else
+      puts "No! Incorrect."
+      @current_player.lives -= 1
+      self.scores_of_players
+      if(@current_player.lives > 0)
+        self.start
+      else
+        puts "Game Over"
+        self.switch_player
+        puts "#{@current_player.name} wins with a score of #{@current_player.lives}"
+      end
     end
-  end
-  
-  def winner(name)
-    puts "The winner is #{name.name} with #{name.lives}/3 lives left"
-    exit(0)
   end
 end 
